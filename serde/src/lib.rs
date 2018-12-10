@@ -77,13 +77,12 @@
 // Serde types in rustdoc of other crates get linked to here.
 #![doc(html_root_url = "https://docs.rs/serde/1.0.88")]
 // Support using Serde without the standard library!
-#![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(not(any(feature = "alloc", feature = "std")), no_std)]
 // Unstable functionality only if the user asks for it. For tracking and
 // discussion of these features please refer to this issue:
 //
 //    https://github.com/serde-rs/serde/issues/812
 #![cfg_attr(feature = "unstable", feature(specialization, never_type))]
-#![cfg_attr(feature = "alloc", feature(alloc))]
 #![cfg_attr(feature = "cargo-clippy", allow(renamed_and_removed_lints))]
 #![cfg_attr(feature = "cargo-clippy", deny(clippy, clippy_pedantic))]
 // Ignored clippy and clippy_pedantic lints
@@ -118,17 +117,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(feature = "alloc")]
-extern crate alloc;
-
 /// A facade around all the types we need from the `std`, `core`, and `alloc`
 /// crates. This avoids elaborate import wrangling having to happen in every
 /// module.
 mod lib {
     mod core {
-        #[cfg(not(feature = "std"))]
+        #[cfg(not(any(feature = "alloc", feature = "std")))]
         pub use core::*;
-        #[cfg(feature = "std")]
+        #[cfg(any(feature = "alloc", feature = "std"))]
         pub use std::*;
     }
 
@@ -147,39 +143,25 @@ mod lib {
     pub use self::core::option::{self, Option};
     pub use self::core::result::{self, Result};
 
-    #[cfg(all(feature = "alloc", not(feature = "std")))]
-    pub use alloc::borrow::{Cow, ToOwned};
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "alloc", feature = "std"))]
     pub use std::borrow::{Cow, ToOwned};
 
-    #[cfg(all(feature = "alloc", not(feature = "std")))]
-    pub use alloc::string::{String, ToString};
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "alloc", feature = "std"))]
     pub use std::string::String;
 
-    #[cfg(all(feature = "alloc", not(feature = "std")))]
-    pub use alloc::vec::Vec;
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "alloc", feature = "std"))]
     pub use std::vec::Vec;
 
-    #[cfg(all(feature = "alloc", not(feature = "std")))]
-    pub use alloc::boxed::Box;
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "alloc", feature = "std"))]
     pub use std::boxed::Box;
 
-    #[cfg(all(feature = "rc", feature = "alloc", not(feature = "std")))]
-    pub use alloc::rc::{Rc, Weak as RcWeak};
-    #[cfg(all(feature = "rc", feature = "std"))]
+    #[cfg(any(feature = "alloc", feature = "std"))]
     pub use std::rc::{Rc, Weak as RcWeak};
 
-    #[cfg(all(feature = "rc", feature = "alloc", not(feature = "std")))]
-    pub use alloc::sync::{Arc, Weak as ArcWeak};
-    #[cfg(all(feature = "rc", feature = "std"))]
+    #[cfg(any(feature = "alloc", feature = "std"))]
     pub use std::sync::{Arc, Weak as ArcWeak};
 
-    #[cfg(all(feature = "alloc", not(feature = "std")))]
-    pub use alloc::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, VecDeque};
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "alloc", feature = "std"))]
     pub use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, VecDeque};
 
     #[cfg(feature = "std")]
